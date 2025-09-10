@@ -42,7 +42,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50">
+    <main className="min-h-screen flex flex-col items-center justify-between p-6 bg-gray-50">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-6">
         <h1 className="text-2xl font-bold mb-4 text-center">
           IEEE Citation Generator
@@ -150,6 +150,11 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Copyright footer */}
+      <footer className="mt-6 text-center text-gray-500 text-sm">
+        © aiwmr7@2025
+      </footer>
     </main>
   );
 }
