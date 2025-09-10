@@ -1,103 +1,155 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [authors, setAuthors] = useState("");
+  const [title, setTitle] = useState("");
+  const [year, setYear] = useState("");
+  const [pubType, setPubType] = useState("journal");
+  const [volume, setVolume] = useState("");
+  const [pages, setPages] = useState("");
+  const [journal, setJournal] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [citation, setCitation] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const generateCitation = () => {
+    // Format authors (IEEE style: Initial. Lastname, …)
+    const formattedAuthors = authors
+      .split(",")
+      .map((a) => {
+        const parts = a.trim().split(" ");
+        if (parts.length === 1) return parts[0]; // fallback
+        const lastName = parts.pop();
+        const initials = parts.map((p) => p[0] + ".").join(" ");
+        return `${initials} ${lastName}`;
+      })
+      .join(", ");
+
+    let result = "";
+
+    if (pubType === "journal") {
+      result = `${formattedAuthors}, "${title}," ${journal}, vol. ${volume}, pp. ${pages}, ${year}.`;
+    } else if (pubType === "conference") {
+      result = `${formattedAuthors}, "${title}," in *Proceedings of ${journal}*, pp. ${pages}, ${year}.`;
+    } else if (pubType === "book") {
+      result = `${formattedAuthors}, *${title}*. ${publisher}, ${year}.`;
+    } else {
+      result = `${formattedAuthors}, "${title}," ${year}.`;
+    }
+
+    setCitation(result);
+  };
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50">
+      <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-6">
+        <h1 className="text-2xl font-bold mb-4 text-center">
+          IEEE Citation Generator
+        </h1>
+        <div className="space-y-3">
+          <input
+            type="text"
+            placeholder="Authors (comma-separated, e.g. John Doe, Alice Smith)"
+            value={authors}
+            onChange={(e) => setAuthors(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Year"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="w-full border p-2 rounded"
+          />
+          <select
+            value={pubType}
+            onChange={(e) => setPubType(e.target.value)}
+            className="w-full border p-2 rounded"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <option value="journal">Journal Article</option>
+            <option value="conference">Conference Paper</option>
+            <option value="book">Book</option>
+            <option value="other">Other</option>
+          </select>
+
+          {pubType === "journal" && (
+            <>
+              <input
+                type="text"
+                placeholder="Journal/Source Name"
+                value={journal}
+                onChange={(e) => setJournal(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Volume"
+                value={volume}
+                onChange={(e) => setVolume(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Pages (e.g. 123-130)"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+            </>
+          )}
+
+          {pubType === "conference" && (
+            <>
+              <input
+                type="text"
+                placeholder="Conference Name"
+                value={journal}
+                onChange={(e) => setJournal(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Pages"
+                value={pages}
+                onChange={(e) => setPages(e.target.value)}
+                className="w-full border p-2 rounded"
+              />
+            </>
+          )}
+
+          {pubType === "book" && (
+            <input
+              type="text"
+              placeholder="Publisher"
+              value={publisher}
+              onChange={(e) => setPublisher(e.target.value)}
+              className="w-full border p-2 rounded"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          )}
+
+          <button
+            onClick={generateCitation}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
-            Read our docs
-          </a>
+            Generate Citation
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {citation && (
+          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+            <h2 className="font-semibold">Generated IEEE Citation:</h2>
+            <p className="mt-2">{citation}</p>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
